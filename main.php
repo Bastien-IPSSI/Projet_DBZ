@@ -111,7 +111,10 @@ class Gentil extends Personnage{
     }
 
     public function gagnerExperience($experienceGagnee){
+        echo $this->getExperience();
         $this->setExperience($this->getExperience() + $experienceGagnee);
+        echo "\n";
+        echo $this->getExperience();
         echo $this->getNom() . " a " . $this->getExperience() . " points d'expérience\n";
         $this->gagnerNiveau();
     }
@@ -262,9 +265,8 @@ class Mechant extends Personnage{
         $this->setVie($this->getVie()-$degats);
         if ($this->vie < 1) {
             echo $this->getNom() . " est mort \n";
-            $this->setEstMort($this->getEstMort());
-        }else {echo "Vous avez gagné un niveau\n";
-            echo "Vous êtes niveau 2\n";
+            $this->setEstMort();
+        }else {
             echo $this->getNom() . " a encore " . $this->getVie() . " points de vie \n";
         }
     }
@@ -288,6 +290,7 @@ function combat(Gentil $personnage, $listeEnnemis){
                     // $listeEnnemis[0]->recevoirDegats($personnage->attaquer($personnage->choisirAttaque()));
                     if ($listeEnnemis[0]->getEstMort() == true) {
                         $personnage->gagnerExperience($listeEnnemis[0]->getExperience());
+                        array_unshift($listeEnnemis, $listeEnnemis[0]);
                         break;
                     }
                     // Tour de l'ennemi
