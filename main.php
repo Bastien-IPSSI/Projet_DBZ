@@ -57,7 +57,6 @@ class Gentil extends Personnage{
                     $choix = (int)readline("Quelle attaque?\n1. Coup de poing");
                 }
                 return $choix;
-                break;
             case 2:
                 $choix = (int)readline("Quelle attaque?\n1. Coup de poing \n2. Kamehaha");
                 while($choix !== 1 or $choix !== 2){
@@ -78,22 +77,19 @@ class Gentil extends Personnage{
             case 1:
                 // COUP DE POING MULTIPLIE LES DEGATS INFLIGES PAR 1
                 return 1 * $this->getDegats();
-                break;
             case 2:
                 // KAMEHAHA MULTIPLIE LES DEGATS INFLIGES PAR 2 ETC
-                return 2 * $this>getDegats();
-                break;
+                return 2 * $this->getDegats();
             case 3:
                 // GENKIDAMA MULTIPLIE LES DEGATS INFLIGES PAR 2 ETC
-                return 3 * $this>getDegats();
-                break;
+                return 3 * $this->getDegats();
     } 
 }}
 
 
 class Mechant extends Personnage{
-    public function __construct(){
-        parent::__construct();
+    public function __construct($nom,$vie,$degats){
+        parent::__construct($nom,$vie,$degats);
     }
 
     // GETTERS
