@@ -58,6 +58,9 @@ class Gentil extends Personnage{
     public function setNiveau($nouveauNiveau){
         $this->niveau = $nouveauNiveau;
     }
+    public function setDegats($nouveauDegats){
+        $this->degats = $nouveauDegats;
+    }
 
     // METHODS
     public function choisirAttaque(){
@@ -116,33 +119,53 @@ class Gentil extends Personnage{
         switch ($this->getNiveau()) {
             case 1:
                 if ($this->getExperience() > 10) {
+                    // GAGNER UN NIVEAU
                     $this->setNiveau($this->getNiveau() + 1);
+                    // RESET L'EXPERIENCE
                     $this->setExperience($this->getExperience() - 10);
+                    // MODIFIER STATS
+                    $this->setVie($this->getVie() * 2);
+                    $this->setDegats($this->getDegats() + 5);
+
                 }
                 break;
             case 2:
                 if ($this->getExperience() > 20) {
                     $this->setNiveau($this->getNiveau() + 1);
                     $this->setExperience($this->getExperience() - 20);
+                    $this->setVie($this->getVie() * 2);
+                    $this->setDegats($this->getDegats() + 5);
                 }
                 break;
             case 3:
                 if ($this->getExperience() > 30) {
                     $this->setNiveau($this->getNiveau() + 1);
                     $this->setExperience($this->getExperience() - 30);
+                    $this->setVie($this->getVie() * 2);
+                    $this->setDegats($this->getDegats() + 5);
+                    // DEBLOQUER NOUVEAU POUVOIR AU NIVEAU 3
+                    array_push($this->pouvoirs, $this->pouvoirsDebloquer[0]);
                 }
                 break;
             case 4:
                 if ($this->getExperience() > 40) {
                     $this->setNiveau($this->getNiveau() + 1);
                     $this->setExperience($this->getExperience() - 40);
+                    $this->setVie($this->getVie() * 2);
+                    $this->setDegats($this->getDegats() + 5);
                 }
                 break;
             case 5:
                 if ($this->getExperience() > 50) {
                     $this->setNiveau($this->getNiveau() + 1);
                     $this->setExperience($this->getExperience() - 50);
+                    $this->setVie($this->getVie() * 2);
+                    $this->setDegats($this->getDegats() + 5);
+                    // DEBLOQUER NOUVEAU POUVOIR AU NIVEAU 5
+                    array_push($this->pouvoirs, $this->pouvoirsDebloquer[1]);
                 }
+                break;
+            default:
                 break;
         }
     }
@@ -151,10 +174,12 @@ class Gentil extends Personnage{
 
 class Mechant extends Personnage{
     private $pouvoirs = array();
+    private int $experience;
 
-    public function __construct($nom,$vie,$degats,$pouvoirs){
+    public function __construct($nom,$vie,$degats,$pouvoirs,$experience){
         parent::__construct($nom,$vie,$degats);
         $this->pouvoirs = $pouvoirs;
+        $this->experience = $experience;
     }
 
     // GETTERS
@@ -203,7 +228,6 @@ class Mechant extends Personnage{
         $this->setVie($this->getVie()-$degats);
         if ($this->vie < 1) {
             echo $this->getNom() . " est mort \n";
-            // TODO AJOUTER EXP
         }else {
             echo $this->getNom() . " a encore " . $this->getVie() . " points de vie \n";
         }
@@ -216,8 +240,7 @@ $pouvoirMechants = array("Coup de poing","Coup de pied","Big Bang Attack","Crush
 
 // $goku = new Gentil("Goku", 10, 3);
 // echo "il a tapé " . $goku->attaquer($goku->choisirAttaque());
-$saibaman = new Mechant("Saibaman", 5, 1, ["Coup de poing", "Coup de pied"]);
+$saibaman = new Mechant("Saibaman", 5, 1, ["Coup de poing", "Coup de pied"], 5);
 echo "il a tapé " . $saibaman->attaquer($saibaman->choisirAttaque());
-
 
 ?>
