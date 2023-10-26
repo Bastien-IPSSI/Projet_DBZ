@@ -4,13 +4,11 @@ abstract class Personnage{
     protected string $nom;
     protected int $vie;
     protected int $degats;
-    protected $pouvoir = array();
 
     protected function __construct($nom,$vie,$degats){
         $this->nom = $nom;
         $this->vie = $vie;
         $this->degats = $degats;
-        $this->pouvoir = ["Coup de poing"];
     }
 
     // protected function attaquer();
@@ -19,12 +17,15 @@ abstract class Personnage{
 class Gentil extends Personnage{
     private int $niveau;
     private int $experience;
-    private $pouvoirsDebloquer = array("Kamehaha","Genkidama");
+    private $pouvoirs = array();
+    private $pouvoirsDebloquer = array();
 
     public function __construct($nom,$vie,$degats){
         parent::__construct($nom,$vie,$degats);
         $this->niveau = 1;
         $this->experience = 0;
+        $this->pouvoirsDebloquer = ["Kamehaha","Genkidama"];
+        $this->pouvoirs = ["Coup de poing"];
     }
 
     // GETTERS
@@ -37,8 +38,8 @@ class Gentil extends Personnage{
     public function getDegats(){
         return $this->degats;
     }
-    public function getPouvoir(){
-        return $this->pouvoir;
+    public function getPouvoirs(){
+        return $this->pouvoirs;
     }
     public function getNiveau(){
         return $this->niveau;
@@ -47,9 +48,20 @@ class Gentil extends Personnage{
         return $this->experience;
     }
 
+    // SETTERS
+    public function setVie($nouveauVie){
+        $this->vie = $nouveauVie;
+    }
+    public function setExperience($nouveauExperience){
+        $this->experience = $nouveauExperience;
+    }
+    public function setNiveau($nouveauNiveau){
+        $this->niveau = $nouveauNiveau;
+    }
+
     // METHODS
     public function choisirAttaque(){
-        $listePouvoirs = count($this->getPouvoir());
+        $listePouvoirs = count($this->getPouvoirs());
         switch ($listePouvoirs) {
             case 1:
                 $choix = (int)readline("Quelle attaque?\n1. Coup de poing");
@@ -81,15 +93,68 @@ class Gentil extends Personnage{
                 // KAMEHAHA MULTIPLIE LES DEGATS INFLIGES PAR 2 ETC
                 return 2 * $this->getDegats();
             case 3:
-                // GENKIDAMA MULTIPLIE LES DEGATS INFLIGES PAR 2 ETC
+                // GENKIDAMA MULTIPLIE LES DEGATS INFLIGES PAR 3 ETC
                 return 3 * $this->getDegats();
-    } 
-}}
+    }
+}
+
+    public function recevoirDegats($degats){
+        $this->setVie($this->getVie()-$degats);
+        if ($this->vie < 1) {
+            echo "Perdu\n";
+        }else {
+            echo $this->getNom() . " a encore " . $this->getVie() . " points de vie \n";
+        }
+    }
+
+    public function gagnerExperience($experienceGagnee){
+        $this->setExperience($this->getExperience() + $experienceGagnee);
+        echo $this->getNom() . " a " . $this->getExperience() . " points d'expérience\n";
+    }
+
+    public function gagnerNiveau(){
+        switch ($this->getNiveau()) {
+            case 1:
+                if ($this->getExperience() > 10) {
+                    $this->setNiveau($this->getNiveau() + 1);
+                    $this->setExperience($this->getExperience() - 10);
+                }
+                break;
+            case 2:
+                if ($this->getExperience() > 20) {
+                    $this->setNiveau($this->getNiveau() + 1);
+                    $this->setExperience($this->getExperience() - 20);
+                }
+                break;
+            case 3:
+                if ($this->getExperience() > 30) {
+                    $this->setNiveau($this->getNiveau() + 1);
+                    $this->setExperience($this->getExperience() - 30);
+                }
+                break;
+            case 4:
+                if ($this->getExperience() > 40) {
+                    $this->setNiveau($this->getNiveau() + 1);
+                    $this->setExperience($this->getExperience() - 40);
+                }
+                break;
+            case 5:
+                if ($this->getExperience() > 50) {
+                    $this->setNiveau($this->getNiveau() + 1);
+                    $this->setExperience($this->getExperience() - 50);
+                }
+                break;
+        }
+    }
+}
 
 
 class Mechant extends Personnage{
-    public function __construct($nom,$vie,$degats){
+    private $pouvoirs = array();
+
+    public function __construct($nom,$vie,$degats,$pouvoirs){
         parent::__construct($nom,$vie,$degats);
+        $this->pouvoirs = $pouvoirs;
     }
 
     // GETTERS
@@ -102,11 +167,57 @@ class Mechant extends Personnage{
     public function getDegats(){
         return $this->degats;
     }
+    public function getPouvoir(){
+        return $this->pouvoirs;
+    }
+
+    // SETTERS
+    public function setVie($nouveauVie){
+        $this->vie = $nouveauVie;
+    }
+
+    // METHODS
+    public function choisirAttaque(){
+        $choix = rand(0,count($this->getPouvoir())-1);
+        return $choix;
+    }
+
+    public function attaquer($pouvoirChoisi){
+        switch ($pouvoirChoisi) {
+            case 0:
+                // COUP DE POING MULTIPLIE LES DEGATS INFLIGES PAR 1
+                return 1 * $this->getDegats();
+            case 1:
+                // COUP DE PIED MULTIPLIE LES DEGATS INFLIGES PAR 2 ETC
+                return 2 * $this->getDegats();
+            case 2:
+                // BIG BANG ATTACK MULTIPLIE LES DEGATS INFLIGES PAR 3 ETC
+                return 3 * $this->getDegats();
+            case 3:
+                // CRUSH CANNON MULTIPLIE LES DEGATS INFLIGES PAR 4 ETC
+                return 4 * $this->getDegats();
+        }
+    }
+
+    public function recevoirDegats($degats){
+        $this->setVie($this->getVie()-$degats);
+        if ($this->vie < 1) {
+            echo $this->getNom() . " est mort \n";
+            // TODO AJOUTER EXP
+        }else {
+            echo $this->getNom() . " a encore " . $this->getVie() . " points de vie \n";
+        }
+    }
 }
+
+$pouvoirMechants = array("Coup de poing","Coup de pied","Big Bang Attack","Crush Cannon");
 
 // RUN
 
-$goku = new Gentil("Goku", 10, 3);
-echo "il a tapé " . $goku->attaquer($goku->choisirAttaque());
+// $goku = new Gentil("Goku", 10, 3);
+// echo "il a tapé " . $goku->attaquer($goku->choisirAttaque());
+$saibaman = new Mechant("Saibaman", 5, 1, ["Coup de poing", "Coup de pied"]);
+echo "il a tapé " . $saibaman->attaquer($saibaman->choisirAttaque());
+
 
 ?>
