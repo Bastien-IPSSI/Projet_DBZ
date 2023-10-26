@@ -105,16 +105,15 @@ class Gentil extends Personnage{
         $this->setVie($this->getVie()-$degats);
         if ($this->vie < 1) {
             echo "Perdu\n";
+            $this->finDeJeu();
+            exit;
         }else {
             echo $this->getNom() . " a encore " . $this->getVie() . " points de vie \n";
         }
     }
 
     public function gagnerExperience($experienceGagnee){
-        echo $this->getExperience();
         $this->setExperience($this->getExperience() + $experienceGagnee);
-        echo "\n";
-        echo $this->getExperience();
         echo $this->getNom() . " a " . $this->getExperience() . " points d'expérience\n";
         $this->gagnerNiveau();
     }
@@ -195,13 +194,17 @@ class Gentil extends Personnage{
             echo "- " . $this->getPouvoirs()[$i] . "\n";
         }
     }
+
+    public function finDeJeu(){
+        echo "JEU FINI";
+    }
 }
 
 
 class Mechant extends Personnage{
     private $pouvoirs = array();
     private int $experience;
-    private bool $estMort;
+    protected bool $estMort;
 
     public function __construct($nom,$vie,$degats,$pouvoirs,$experience){
         parent::__construct($nom,$vie,$degats);
@@ -290,21 +293,58 @@ function combat(Gentil $personnage, $listeEnnemis){
                     // $listeEnnemis[0]->recevoirDegats($personnage->attaquer($personnage->choisirAttaque()));
                     if ($listeEnnemis[0]->getEstMort() == true) {
                         $personnage->gagnerExperience($listeEnnemis[0]->getExperience());
-                        array_unshift($listeEnnemis, $listeEnnemis[0]);
-                        break;
+                        unset($listeEnnemis[0]);
+                        echo "Le combat est fini\n";
+                        exit;
                     }
                     // Tour de l'ennemi
+                    $choixAttaqueEnnemi = $listeEnnemis[0]->choisirAttaque();
+                    echo $listeEnnemis[0]->getNom() . " choisi l'attaque " . $listeEnnemis[0]->getPouvoirs()[$choixAttaqueEnnemi] . "\n";
+                    $degatsInfligesEnnemi = $listeEnnemis[0]->attaquer($choixAttaqueEnnemi);
+                    $personnage->recevoirDegats($degatsInfligesEnnemi);
                     break;
                 case 2:
+                    $personnage->afficherInfos();
                     break;
                 default:
                     break;
             }
         }else {
-            // TODO COMBAT A PLUSIEURS CHOISIR
+            // Tour du joueur
+            $choix = (int)readline("1. Attaquer 2. Voir statistiques\n");
+            // VERIF
+            while ($choix < 1 || $choix > 2) {
+                $choix = (int)readline("1. Attaquer 2. Voir statistiques\n");
+            }
+            switch ($choix) {
+                // Tour d'attaque
+                case 1:
+                    echo "Voici la liste des ennemis:\n";
+                    for ($i=0; $i < count($listeEnnemis); $i++) {
+                        echo $i+1 . ". " . $listeEnnemis[$i]->getNom() . "(" . $listeEnnemis[$i]->getVie() . " pv)\n";
+                    }
+                    $choixEnnemi = (int)readline("Quel ennemi?\n") -1;
+                    $choixAttaque = $personnage->choisirAttaque();
+                    $degatsInfliges = $personnage->attaquer(($choixAttaque));
+                    $listeEnnemis[$choixEnnemi]->recevoirDegats($degatsInfliges);
+                    if ($listeEnnemis[$choixEnnemi]->getEstMort() == true) {
+                        $personnage->gagnerExperience($listeEnnemis[$choixEnnemi]->getExperience());
+                        unset($listeEnnemis[$choixEnnemi]);
+                    }
+                    // Tour de l'ennemi
+                    echo "Un des ennemis attaque\n";
+                    $rand = rand(0,count($listeEnnemis)-1);
+                    $choixAttaqueEnnemi = $listeEnnemis[$rand]->choisirAttaque();
+                    echo $listeEnnemis[$rand]->getNom() . " choisi l'attaque " . $listeEnnemis[$rand]->getPouvoirs()[$choixAttaqueEnnemi] . "\n";
+                    $degatsInfligesEnnemi = $listeEnnemis[$rand]->attaquer($choixAttaqueEnnemi);
+                    $personnage->recevoirDegats($degatsInfligesEnnemi);
+                    break;
+                case 2:
+                    $personnage->afficherInfos();
+            }
         }
     }
-    echo "Fin de combat\n";
+    // echo "Fin de combat\n";
 }
 
 $pouvoirsMechants = array("Coup de poing","Coup de pied","Big Bang Attack","Crush Cannon");
@@ -314,7 +354,8 @@ $pouvoirsMechants = array("Coup de poing","Coup de pied","Big Bang Attack","Crus
 $goku = new Gentil("Goku", 10, 3);
 
 $saibaman = new Mechant("Saibaman", 5, 1, ["Coup de poing", "Coup de pied"], 5);
+$saibaman2 = new Mechant("Saibaman2", 1, 5, ["Coup de poing", "Coup de pied"], 10);
 
-combat($goku, array($saibaman));
+combat($goku, array($saibaman, $saibaman2));
 
 ?>
