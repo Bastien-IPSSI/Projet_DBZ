@@ -149,26 +149,26 @@ class Gentil extends Personnage{
                         if ($this->getExperience() >= 30) {
                             echo "Vous avez gagné un niveau\n";
                             echo "Vous êtes niveau 4\n";
-                    $this->setNiveau($this->getNiveau() + 1);
-                    $this->setExperience($this->getExperience() - 30);
-                    $this->setVie($this->getVie() * 2);
-                    $this->setDegats($this->getDegats() + 5);
-                    
-                }
-                break;
-                case 4:
-                    if ($this->getExperience() >= 40) {
-                        echo "Vous avez gagné un niveau\n";
-                        echo "Vous êtes niveau 5\n";
-                        $this->setNiveau($this->getNiveau() + 1);
-                        $this->setExperience($this->getExperience() - 40);
-                        $this->setVie($this->getVie() * 2);
-                        $this->setDegats($this->getDegats() + 5);
-                        // DEBLOQUER NOUVEAU POUVOIR AU NIVEAU 5
-                        array_push($this->pouvoirs, $this->pouvoirsDebloquer[1]);
-                    }
-                break;
-            case 5:
+                            $this->setNiveau($this->getNiveau() + 1);
+                            $this->setExperience($this->getExperience() - 30);
+                            $this->setVie($this->getVie() * 2);
+                            $this->setDegats($this->getDegats() + 5);
+                            
+                        }
+                        break;
+                        case 4:
+                            if ($this->getExperience() >= 40) {
+                                echo "Vous avez gagné un niveau\n";
+                                echo "Vous êtes niveau 5\n";
+                                $this->setNiveau($this->getNiveau() + 1);
+                                $this->setExperience($this->getExperience() - 40);
+                                $this->setVie($this->getVie() * 2);
+                                $this->setDegats($this->getDegats() + 5);
+                                // DEBLOQUER NOUVEAU POUVOIR AU NIVEAU 5
+                                array_push($this->pouvoirs, $this->pouvoirsDebloquer[1]);
+                            }
+                            break;
+                            case 5:
                 if ($this->getExperience() >= 50) {
                     echo "Vous avez gagné un niveau\n";
                     echo "Vous êtes niveau 6\n";
@@ -416,10 +416,37 @@ new Mechant("Vegeta", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied", "B
     }
 }
 
+function creerPersonnage(){
+    $goku = new Gentil("Goku", 10, 3);
+    $piccolo = new Gentil("Piccolo", 8, 4);
+    $yamcha = new Gentil("Yamcha", 5, 2);
+
+    echo "Choisir un personnage\n";
+    $choix = (int)readline("1. Goku \n2. Piccolo \n3. Yamcha\n");
+    switch ($choix) {
+        case 1:
+            return $goku;
+            break;
+        case 2:
+            return $piccolo;
+            break;
+        case 3:
+            return $yamcha;
+            break;
+        // case 4:
+        //     $nom = (string)readline("Nom?\n");
+        //     $vie = (int)readline("Vie?\n");
+        //     $dmg = (int)readline("Dégâts?\n");
+        //     $personnage = new Gentil($nom, $vie, $dmg);
+        //     break;
+        default:
+            creerPersonnage();
+            break;
+    }
+}
+
 // RUN
 
-$goku = new Gentil("Goku", 1000, 100);
-
-jeu($goku, $listeMechantsNiveau1, $listeMechantsNiveau2);
+jeu(creerPersonnage(), $listeMechantsNiveau1, $listeMechantsNiveau2);
 
 ?>
