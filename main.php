@@ -61,6 +61,9 @@ class Gentil extends Personnage{
     public function setDegats($nouveauDegats){
         $this->degats = $nouveauDegats;
     }
+    public function setPouvoirs($nouveauPouvoirs){
+        $this->pouvoirs = $nouveauPouvoirs;
+    }
 
     // METHODS
     public function choisirAttaque(){
@@ -283,6 +286,7 @@ function combat(Gentil $personnage, $listeEnnemis){
     echo "Le combat commence\n";
     while ($personnage->getVie() > 0 || count($listeEnnemis) < 1) {
         if (count($listeEnnemis) == 1) {
+            echo "Vous vous battez contre " . $listeEnnemis[0]->getNom() . "\n";
             // Tour du joueur
             $choix = (int)readline("1. Attaquer 2. Voir statistiques\n");
             // VERIF
@@ -337,7 +341,7 @@ function combat(Gentil $personnage, $listeEnnemis){
                         $listeEnnemis = array_values($listeEnnemis);
                     }
                     // Tour de l'ennemi
-                    echo "Un des ennemis attaque\n";
+                    echo "Les ennemis se concertent pour savoir qui va attaquer!\n";
                     $rand = rand(0,count($listeEnnemis)-1);
                     $choixAttaqueEnnemi = $listeEnnemis[$rand]->choisirAttaque();
                     echo $listeEnnemis[$rand]->getNom() . " choisi l'attaque " . $listeEnnemis[$rand]->getPouvoirs()[$choixAttaqueEnnemi] . "\n";
@@ -385,9 +389,7 @@ function ennemiAleatoire($nombreEnnemis){
     }
 }
 
-function jeu($heros){
-
-    $cmptVictoires = 1;
+function jeu($heros, $cmptVictoires){
     while ($cmptVictoires < 11) {
         echo "Le combat numéro " . $cmptVictoires . " commence\n";
         $listeMechantsNiveau1 = array(new Mechant("Saibaman", rand(1,3), rand(1,3), ["Coup de poing", "Coup de pied"], 5),
@@ -406,12 +408,30 @@ new Mechant("Vegeta", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied", "B
                 $listeIndexEnnemi = ennemiAleatoire(1);
                 combat($heros, array($listeMechantsNiveau1[$listeIndexEnnemi[0]]));
                 $cmptVictoires++;
+                // PROPOSITION DE CONTINUER/SAUVEGARDER
+
+                $choix = readline("Que voulez vous faire?\nContinuer (c)\nSauvegarder (s)");
+                while ($choix != "c" and $choix != "s") {
+                    $choix = readline("Que voulez vous faire?\nContinuer (c)\nSauvegarder (s)");
+                }if ($choix == "s") {
+                    sauvegarder($heros, $cmptVictoires);
+                }
                 break;
             case $cmptVictoires >= 5:
                 $listeIndexEnnemi = ennemiAleatoire(2);
                 combat($heros, array($listeMechantsNiveau2[$listeIndexEnnemi[0]], $listeMechantsNiveau2[$listeIndexEnnemi[1]]));
                 $cmptVictoires++;
+                // PROPOSITION DE CONTINUER/SAUVEGARDER
+                $choix = readline("Que voulez vous faire?\nContinuer (c)\nSauvegarder (s)");
+                while ($choix != "c" and $choix != "s") {
+                    $choix = readline("Que voulez vous faire?\nContinuer (c)\nSauvegarder (s)");
+                }if ($choix == "s") {
+                    sauvegarder($heros, $cmptVictoires);
+                }
                 break;
+            default:
+                echo "GAGNE";
+                exit;
         }
     }
 }
@@ -440,13 +460,70 @@ function creerPersonnage(){
         //     $personnage = new Gentil($nom, $vie, $dmg);
         //     break;
         default:
+            echo "test";
             creerPersonnage();
             break;
     }
 }
 
+function sauvegarder($personnage, $cmptVictoires){
+    // PREPARER LISTE DE SAUVEGARDES
+    $listeDeDonnees = array($personnage->getNom(), 
+    $personnage->getVie(), 
+    $personnage->getDegats(), 
+    $personnage->getExperience(), 
+    $personnage->getNiveau(),
+    $personnage->getPouvoirs(),
+    $cmptVictoires);
+    // SERIALIZER LA DONNEE
+    $listeDeDonnees = serialize($listeDeDonnees);
+    file_put_contents("save.txt", $listeDeDonnees);
+    echo "Partie sauvegardée\n";
+    exit;
+}
+
+function chargerSauvegarde(){
+    $listeDeDonnees = file_get_contents("save.txt");
+    $listeDeDonnees = unserialize($listeDeDonnees);
+    $heros = new Gentil($listeDeDonnees[0], $listeDeDonnees[1], $listeDeDonnees[2]);
+    $heros->setExperience($listeDeDonnees[3]);
+    $heros->setNiveau($listeDeDonnees[4]);
+    $heros->setPouvoirs($listeDeDonnees[5]);
+    echo "Partie chargée\n";
+    return array($heros, $listeDeDonnees[6]);
+}
+
+function clearTerminal(){
+    popen("cls","w");
+}
+
+function clearTerminalPlayerInput(){
+    popen("cls","w");
+    $entree = readline("Appuyer sur entrée pour continuer");
+    while ($entree != "") {
+        $entree = readline("Appuyer sur entrée pour continuer");
+    }
+    sleep(1);
+}
+
 // RUN
 
-jeu(creerPersonnage(), $listeMechantsNiveau1, $listeMechantsNiveau2);
-
+$nouvellePartie = strtolower(readline("Nouvelle partie (n)\nCharger partie (c)\n"));
+clearTerminal();
+while ($nouvellePartie != "n" and $nouvellePartie != "c") {
+    clearTerminal();
+    echo "Erreur\n";
+    $nouvellePartie = strtolower(readline("Nouvelle partie (n)\nCharger partie (c)\n"));
+    clearTerminal();
+}if ($nouvellePartie == "c" && filesize("save.txt" == 0)) {
+    echo "Aucune partie n'a été sauvegardée\nVous allez commencer une nouvelle partie\n";
+    $nouvellePartie = "n";
+}if ($nouvellePartie == "n"){
+    jeu(creerPersonnage(), 1);   
+}else {
+    $lst = chargerSauvegarde();
+    $personnage = $lst[0];
+    $cmptVictoires = $lst[1];
+    jeu($personnage, $cmptVictoires);   
+}
 ?>
