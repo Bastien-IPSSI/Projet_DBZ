@@ -68,19 +68,19 @@ class Gentil extends Personnage{
         switch ($listePouvoirs) {
             case 1:
                 $choix = (int)readline("Quelle attaque?\n1. Coup de poing");
-                while($choix !== 1){
+                while($choix != 1){
                     $choix = (int)readline("Quelle attaque?\n1. Coup de poing");
                 }
                 return $choix;
             case 2:
                 $choix = (int)readline("Quelle attaque?\n1. Coup de poing \n2. Kamehaha");
-                while($choix !== 1 or $choix !== 2){
+                while($choix < 1 || $choix > 2){
                     $choix = (int)readline("Quelle attaque?\n1. Coup de poing \n2. Kamehaha");
                 }
                 return $choix;
             case 3:
                 $choix = (int)readline("Quelle attaque?\n1. Coup de poing \n2. Kamehaha \n3. Genkidama");
-                while($choix !== 1 or $choix !== 2 or $choix !== 3){
+                while($choix < 1 || $choix > 3){
                     $choix = (int)readline("Quelle attaque?\n1. Coup de poing \n2. Kamehaha \n3. Genkidama");
                 }
                 return $choix;
@@ -121,7 +121,7 @@ class Gentil extends Personnage{
     public function gagnerNiveau(){
         switch ($this->getNiveau()) {
             case 1:
-                if ($this->getExperience() > 10) {
+                if ($this->getExperience() >= 10) {
                     echo "Vous avez gagné un niveau\n";
                     echo "Vous êtes niveau 2\n";
                     // GAGNER UN NIVEAU
@@ -131,51 +131,51 @@ class Gentil extends Personnage{
                     // MODIFIER STATS
                     $this->setVie($this->getVie() * 2);
                     $this->setDegats($this->getDegats() + 5);
-
                 }
                 break;
-            case 2:
-                if ($this->getExperience() > 20) {
-                    echo "Vous avez gagné un niveau\n";
-                    echo "Vous êtes niveau 3\n";
-                    $this->setNiveau($this->getNiveau() + 1);
-                    $this->setExperience($this->getExperience() - 20);
-                    $this->setVie($this->getVie() * 2);
-                    $this->setDegats($this->getDegats() + 5);
-                }
-                break;
-            case 3:
-                if ($this->getExperience() > 30) {
-                    echo "Vous avez gagné un niveau\n";
-                    echo "Vous êtes niveau 4\n";
+                case 2:
+                    if ($this->getExperience() >= 20) {
+                        echo "Vous avez gagné un niveau\n";
+                        echo "Vous êtes niveau 3\n";
+                        $this->setNiveau($this->getNiveau() + 1);
+                        $this->setExperience($this->getExperience() - 20);
+                        $this->setVie($this->getVie() * 2);
+                        $this->setDegats($this->getDegats() + 5);
+                        // DEBLOQUER NOUVEAU POUVOIR AU NIVEAU 3
+                        array_push($this->pouvoirs, $this->pouvoirsDebloquer[0]);
+                    }
+                    break;
+                    case 3:
+                        if ($this->getExperience() >= 30) {
+                            echo "Vous avez gagné un niveau\n";
+                            echo "Vous êtes niveau 4\n";
                     $this->setNiveau($this->getNiveau() + 1);
                     $this->setExperience($this->getExperience() - 30);
                     $this->setVie($this->getVie() * 2);
                     $this->setDegats($this->getDegats() + 5);
-                    // DEBLOQUER NOUVEAU POUVOIR AU NIVEAU 3
-                    array_push($this->pouvoirs, $this->pouvoirsDebloquer[0]);
+                    
                 }
                 break;
-            case 4:
-                if ($this->getExperience() > 40) {
-                    echo "Vous avez gagné un niveau\n";
-                    echo "Vous êtes niveau 5\n";
-                    $this->setNiveau($this->getNiveau() + 1);
-                    $this->setExperience($this->getExperience() - 40);
-                    $this->setVie($this->getVie() * 2);
-                    $this->setDegats($this->getDegats() + 5);
-                }
+                case 4:
+                    if ($this->getExperience() >= 40) {
+                        echo "Vous avez gagné un niveau\n";
+                        echo "Vous êtes niveau 5\n";
+                        $this->setNiveau($this->getNiveau() + 1);
+                        $this->setExperience($this->getExperience() - 40);
+                        $this->setVie($this->getVie() * 2);
+                        $this->setDegats($this->getDegats() + 5);
+                        // DEBLOQUER NOUVEAU POUVOIR AU NIVEAU 5
+                        array_push($this->pouvoirs, $this->pouvoirsDebloquer[1]);
+                    }
                 break;
             case 5:
-                if ($this->getExperience() > 50) {
+                if ($this->getExperience() >= 50) {
                     echo "Vous avez gagné un niveau\n";
                     echo "Vous êtes niveau 6\n";
                     $this->setNiveau($this->getNiveau() + 1);
                     $this->setExperience($this->getExperience() - 50);
                     $this->setVie($this->getVie() * 2);
                     $this->setDegats($this->getDegats() + 5);
-                    // DEBLOQUER NOUVEAU POUVOIR AU NIVEAU 5
-                    array_push($this->pouvoirs, $this->pouvoirsDebloquer[1]);
                 }
                 break;
             default:
@@ -197,6 +197,7 @@ class Gentil extends Personnage{
 
     public function finDeJeu(){
         echo "JEU FINI";
+        exit;
     }
 }
 
@@ -256,9 +257,12 @@ class Mechant extends Personnage{
                 // COUP DE PIED MULTIPLIE LES DEGATS INFLIGES PAR 2 ETC
                 return 2 * $this->getDegats();
             case 2:
+                // COUP DE BIDON ATTACK MULTIPLIE LES DEGATS INFLIGES PAR 2 ETC
+                return 2 * $this->getDegats();
+            case 3:
                 // BIG BANG ATTACK MULTIPLIE LES DEGATS INFLIGES PAR 3 ETC
                 return 3 * $this->getDegats();
-            case 3:
+            case 4:
                 // CRUSH CANNON MULTIPLIE LES DEGATS INFLIGES PAR 4 ETC
                 return 4 * $this->getDegats();
         }
@@ -295,7 +299,7 @@ function combat(Gentil $personnage, $listeEnnemis){
                         $personnage->gagnerExperience($listeEnnemis[0]->getExperience());
                         unset($listeEnnemis[0]);
                         echo "Le combat est fini\n";
-                        exit;
+                        return;
                     }
                     // Tour de l'ennemi
                     $choixAttaqueEnnemi = $listeEnnemis[0]->choisirAttaque();
@@ -330,6 +334,7 @@ function combat(Gentil $personnage, $listeEnnemis){
                     if ($listeEnnemis[$choixEnnemi]->getEstMort() == true) {
                         $personnage->gagnerExperience($listeEnnemis[$choixEnnemi]->getExperience());
                         unset($listeEnnemis[$choixEnnemi]);
+                        $listeEnnemis = array_values($listeEnnemis);
                     }
                     // Tour de l'ennemi
                     echo "Un des ennemis attaque\n";
@@ -347,15 +352,74 @@ function combat(Gentil $personnage, $listeEnnemis){
     // echo "Fin de combat\n";
 }
 
-$pouvoirsMechants = array("Coup de poing","Coup de pied","Big Bang Attack","Crush Cannon");
+$pouvoirsMechants = array("Coup de poing","Coup de pied", "Coup de bidon", "Big Bang Attack","Crush Cannon");
+
+$listeMechantsNiveau1 = array(new Mechant("Saibaman", rand(1,3), rand(1,3), ["Coup de poing", "Coup de pied"], 5),
+new Mechant("Raditz", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied"], 5),
+new Mechant("Nappa", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied"], 5),
+new Mechant("Reacum", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied", "Coup de bidon"], 5),
+);
+
+$listeMechantsNiveau2 = array(new Mechant("C17", rand(1,3), rand(1,3), ["Coup de poing", "Coup de pied"], 5),
+new Mechant("C18", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied"], 5),
+new Mechant("Freezer", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied", "Big Bang Attack"], 5),
+new Mechant("Vegeta", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied", "Big Bang Attack"], 5),
+);
+
+function ennemiAleatoire($nombreEnnemis){
+    $listeIndexEnnemi = array();
+    switch ($nombreEnnemis) {
+        case 1:
+            $ennemi = rand(0,3);
+            array_push($listeIndexEnnemi, $ennemi);
+            return $listeIndexEnnemi;
+        case 2 :
+            $ennemi1 = rand(0,3);
+            $ennemi2 = rand(0,3);
+            // NE PAS GENERER DEUX FOIS LE MEME ENNEMI
+            while ($ennemi2 == $ennemi1) {
+                $ennemi2 = rand(0,3);
+            }
+            array_push($listeIndexEnnemi, $ennemi1, $ennemi2);
+            return $listeIndexEnnemi;
+    }
+}
+
+function jeu($heros){
+
+    $cmptVictoires = 1;
+    while ($cmptVictoires < 11) {
+        echo "Le combat numéro " . $cmptVictoires . " commence\n";
+        $listeMechantsNiveau1 = array(new Mechant("Saibaman", rand(1,3), rand(1,3), ["Coup de poing", "Coup de pied"], 5),
+new Mechant("Raditz", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied"], 5),
+new Mechant("Nappa", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied"], 5),
+new Mechant("Reacum", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied", "Coup de bidon"], 5),
+);
+
+$listeMechantsNiveau2 = array(new Mechant("C17", rand(1,3), rand(1,3), ["Coup de poing", "Coup de pied"], 5),
+new Mechant("C18", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied"], 5),
+new Mechant("Freezer", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied", "Big Bang Attack"], 5),
+new Mechant("Vegeta", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied", "Big Bang Attack"], 5),
+);
+        switch ($cmptVictoires) {
+            case $cmptVictoires < 5:
+                $listeIndexEnnemi = ennemiAleatoire(1);
+                combat($heros, array($listeMechantsNiveau1[$listeIndexEnnemi[0]]));
+                $cmptVictoires++;
+                break;
+            case $cmptVictoires >= 5:
+                $listeIndexEnnemi = ennemiAleatoire(2);
+                combat($heros, array($listeMechantsNiveau2[$listeIndexEnnemi[0]], $listeMechantsNiveau2[$listeIndexEnnemi[1]]));
+                $cmptVictoires++;
+                break;
+        }
+    }
+}
 
 // RUN
 
-$goku = new Gentil("Goku", 10, 3);
+$goku = new Gentil("Goku", 1000, 100);
 
-$saibaman = new Mechant("Saibaman", 5, 1, ["Coup de poing", "Coup de pied"], 5);
-$saibaman2 = new Mechant("Saibaman2", 1, 5, ["Coup de poing", "Coup de pied"], 10);
-
-combat($goku, array($saibaman, $saibaman2));
+jeu($goku, $listeMechantsNiveau1, $listeMechantsNiveau2);
 
 ?>
