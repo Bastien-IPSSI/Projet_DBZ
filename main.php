@@ -19,6 +19,7 @@ class Gentil extends Personnage{
     private int $experience;
     private $pouvoirs = array();
     private $pouvoirsDebloquer = array();
+    private $inventaire;
 
     public function __construct($nom,$vie,$degats){
         parent::__construct($nom,$vie,$degats);
@@ -26,6 +27,7 @@ class Gentil extends Personnage{
         $this->experience = 0;
         $this->pouvoirsDebloquer = ["Kamehaha","Genkidama"];
         $this->pouvoirs = ["Coup de poing"];
+        $this->inventaire = array("Senzu" => 0, "Capsule boost" => 0);
     }
 
     // GETTERS
@@ -47,6 +49,9 @@ class Gentil extends Personnage{
     public function getExperience(){
         return $this->experience;
     }
+    public function getInventaire(){
+        return $this->inventaire;
+    }
 
     // SETTERS
     public function setVie($nouveauVie){
@@ -64,28 +69,38 @@ class Gentil extends Personnage{
     public function setPouvoirs($nouveauPouvoirs){
         $this->pouvoirs = $nouveauPouvoirs;
     }
+    public function ajouterObjetInventaire($objet){
+        $this->inventaire[$objet]++;
+    }
+    public function supprimerObjetInventaire($objet){
+        $this->inventaire[$objet]--;
+    }
 
     // METHODS
     public function choisirAttaque(){
         $listePouvoirs = count($this->getPouvoirs());
         switch ($listePouvoirs) {
             case 1:
+                clearTerminal();
                 $choix = (int)readline("Quelle attaque?\n1. Coup de poing");
                 while($choix != 1){
                     $choix = (int)readline("Quelle attaque?\n1. Coup de poing");
                 }
                 return $choix;
             case 2:
+                clearTerminal();
                 $choix = (int)readline("Quelle attaque?\n1. Coup de poing \n2. Kamehaha");
                 while($choix < 1 || $choix > 2){
                     $choix = (int)readline("Quelle attaque?\n1. Coup de poing \n2. Kamehaha");
                 }
                 return $choix;
             case 3:
+                clearTerminal();
                 $choix = (int)readline("Quelle attaque?\n1. Coup de poing \n2. Kamehaha \n3. Genkidama");
                 while($choix < 1 || $choix > 3){
                     $choix = (int)readline("Quelle attaque?\n1. Coup de poing \n2. Kamehaha \n3. Genkidama");
                 }
+                clearTerminal();
                 return $choix;
         } 
     }
@@ -111,13 +126,13 @@ class Gentil extends Personnage{
             $this->finDeJeu();
             exit;
         }else {
-            echo $this->getNom() . " a encore " . $this->getVie() . " points de vie \n";
+            echo $this->getNom() . " a encore " . $this->getVie() . " points de vie.\n";
         }
     }
 
     public function gagnerExperience($experienceGagnee){
         $this->setExperience($this->getExperience() + $experienceGagnee);
-        echo $this->getNom() . " a " . $this->getExperience() . " points d'expérience\n";
+        echo $this->getNom() . " a " . $this->getExperience() . " points d'expérience.\n";
         $this->gagnerNiveau();
     }
 
@@ -125,8 +140,8 @@ class Gentil extends Personnage{
         switch ($this->getNiveau()) {
             case 1:
                 if ($this->getExperience() >= 10) {
-                    echo "Vous avez gagné un niveau\n";
-                    echo "Vous êtes niveau 2\n";
+                    echo "Vous avez gagné un niveau.\n";
+                    echo "Vous êtes niveau 2.\n";
                     // GAGNER UN NIVEAU
                     $this->setNiveau($this->getNiveau() + 1);
                     // RESET L'EXPERIENCE
@@ -139,7 +154,7 @@ class Gentil extends Personnage{
                 case 2:
                     if ($this->getExperience() >= 20) {
                         echo "Vous avez gagné un niveau\n";
-                        echo "Vous êtes niveau 3\n";
+                        echo "Vous êtes niveau 3.\n";
                         $this->setNiveau($this->getNiveau() + 1);
                         $this->setExperience($this->getExperience() - 20);
                         $this->setVie($this->getVie() * 2);
@@ -151,7 +166,7 @@ class Gentil extends Personnage{
                     case 3:
                         if ($this->getExperience() >= 30) {
                             echo "Vous avez gagné un niveau\n";
-                            echo "Vous êtes niveau 4\n";
+                            echo "Vous êtes niveau 4.\n";
                             $this->setNiveau($this->getNiveau() + 1);
                             $this->setExperience($this->getExperience() - 30);
                             $this->setVie($this->getVie() * 2);
@@ -162,7 +177,7 @@ class Gentil extends Personnage{
                         case 4:
                             if ($this->getExperience() >= 40) {
                                 echo "Vous avez gagné un niveau\n";
-                                echo "Vous êtes niveau 5\n";
+                                echo "Vous êtes niveau 5.\n";
                                 $this->setNiveau($this->getNiveau() + 1);
                                 $this->setExperience($this->getExperience() - 40);
                                 $this->setVie($this->getVie() * 2);
@@ -174,7 +189,7 @@ class Gentil extends Personnage{
                             case 5:
                 if ($this->getExperience() >= 50) {
                     echo "Vous avez gagné un niveau\n";
-                    echo "Vous êtes niveau 6\n";
+                    echo "Vous êtes niveau 6.\n";
                     $this->setNiveau($this->getNiveau() + 1);
                     $this->setExperience($this->getExperience() - 50);
                     $this->setVie($this->getVie() * 2);
@@ -200,7 +215,46 @@ class Gentil extends Personnage{
 
     public function finDeJeu(){
         echo "JEU FINI";
+        unlink("save.txt");
         exit;
+    }
+
+    public function afficherInventaire(){
+        echo "Inventaire: \n";
+        foreach ($this->getInventaire() as $key => $value) {
+            echo "- " . $key . " : " . $value . "\n";
+        }
+    }
+
+    public function utiliserObjetInventaire(){
+        $choix = (int)readline("Quel objet voulez vous utiliser?\n1. Senzu\n2. Capsule boost\n");
+        while ($choix < 1 || $choix > 2) {
+            $choix = (int)readline("Quel objet voulez vous utiliser?\n1. Senzu\n2. Capsule boost\n");
+        }
+        switch ($choix) {
+            case 1:
+                if ($this->getInventaire()["Senzu"] > 0) {
+                    $this->setVie($this->getVie() + 10);
+                    $this->supprimerObjetInventaire("Senzu");
+                    echo "Vous avez utilisé un Senzu\n";
+                    echo "Vous avez gagné 10 points de vie\n";
+                }else {
+                    echo "Vous n'avez pas de Senzu\n";
+                }
+                break;
+            case 2:
+                if ($this->getInventaire()["Capsule boost"] > 0) {
+                    $this->setDegats($this->getDegats() + 5);
+                    $this->supprimerObjetInventaire("Capsule boost");
+                    echo "Vous avez utilisé une Capsule boost\n";
+                    echo "Vous avez gagné 5 points de dégâts\n";
+                }else {
+                    echo "Vous n'avez pas de Capsule boost\n";
+                }
+                break;
+            default:
+                break;
+        }
     }
 }
 
@@ -274,24 +328,25 @@ class Mechant extends Personnage{
     public function recevoirDegats($degats){
         $this->setVie($this->getVie()-$degats);
         if ($this->vie < 1) {
-            echo $this->getNom() . " est mort \n";
+            clearTerminal();
+            echo $this->getNom() . " est mort. \n";
             $this->setEstMort();
         }else {
+            clearTerminal();
             echo $this->getNom() . " a encore " . $this->getVie() . " points de vie \n";
         }
     }
 }
 
 function combat(Gentil $personnage, $listeEnnemis){
-    echo "Le combat commence\n";
     while ($personnage->getVie() > 0 || count($listeEnnemis) < 1) {
         if (count($listeEnnemis) == 1) {
-            echo "Vous vous battez contre " . $listeEnnemis[0]->getNom() . "\n";
+            echo "Vous vous battez contre " . $listeEnnemis[0]->getNom() . ".\n";
             // Tour du joueur
-            $choix = (int)readline("1. Attaquer 2. Voir statistiques\n");
+            $choix = (int)readline("1. Attaquer 2. Voir statistiques 3. Utiliser un objet\n");
             // VERIF
-            while ($choix < 1 || $choix > 2) {
-                $choix = (int)readline("1. Attaquer 2. Voir statistiques\n");
+            while ($choix < 1 || $choix > 3) {
+                $choix = (int)readline("1. Attaquer 2. Voir statistiques 3. Utiliser un objet\n");
             }
             switch ($choix) {
                 case 1:
@@ -301,8 +356,19 @@ function combat(Gentil $personnage, $listeEnnemis){
                     // $listeEnnemis[0]->recevoirDegats($personnage->attaquer($personnage->choisirAttaque()));
                     if ($listeEnnemis[0]->getEstMort() == true) {
                         $personnage->gagnerExperience($listeEnnemis[0]->getExperience());
+                        // Le personnage a une chance de gagner un objet à chaque fois qu'un ennemi est tué
+                        $chance = rand(1,5);
+                        if ($chance == 1) {
+                            $personnage->ajouterObjetInventaire("Senzu");
+                            echo "Vous avez gagné un Senzu\n";
+                        }
+                        elseif ($chance == 2) {
+                            $personnage->ajouterObjetInventaire("Capsule boost");
+                            echo "Vous avez gagné une Capsule boost\n";
+                        }
                         unset($listeEnnemis[0]);
-                        echo "Le combat est fini\n";
+                        echo "Le combat est fini.\n";
+                        clearTerminalPlayerInput();
                         return;
                     }
                     // Tour de l'ennemi
@@ -312,17 +378,21 @@ function combat(Gentil $personnage, $listeEnnemis){
                     $personnage->recevoirDegats($degatsInfligesEnnemi);
                     break;
                 case 2:
+                    clearTerminal();
                     $personnage->afficherInfos();
+                    clearTerminalPlayerInput();
                     break;
-                default:
+                case 3:
+                    $personnage->afficherInventaire();
+                    $personnage->utiliserObjetInventaire();
                     break;
             }
         }else {
             // Tour du joueur
-            $choix = (int)readline("1. Attaquer 2. Voir statistiques\n");
+            $choix = (int)readline("1. Attaquer 2. Voir statistiques 3. Utiliser un objet\n");
             // VERIF
-            while ($choix < 1 || $choix > 2) {
-                $choix = (int)readline("1. Attaquer 2. Voir statistiques\n");
+            while ($choix < 1 || $choix > 3) {
+                $choix = (int)readline("1. Attaquer 2. Voir statistiques 3. Utiliser un objet\n");
             }
             switch ($choix) {
                 // Tour d'attaque
@@ -337,6 +407,16 @@ function combat(Gentil $personnage, $listeEnnemis){
                     $listeEnnemis[$choixEnnemi]->recevoirDegats($degatsInfliges);
                     if ($listeEnnemis[$choixEnnemi]->getEstMort() == true) {
                         $personnage->gagnerExperience($listeEnnemis[$choixEnnemi]->getExperience());
+                        // Le personnage a une chance de gagner un objet à chaque fois qu'un ennemi est tué
+                        $chance = rand(1,5);
+                        if ($chance == 1) {
+                            $personnage->ajouterObjetInventaire("Senzu");
+                            echo "Vous avez gagné un Senzu.\n";
+                        }
+                        elseif ($chance == 2) {
+                            $personnage->ajouterObjetInventaire("Capsule boost");
+                            echo "Vous avez gagné une Capsule boost.\n";
+                        }
                         unset($listeEnnemis[$choixEnnemi]);
                         $listeEnnemis = array_values($listeEnnemis);
                     }
@@ -350,6 +430,11 @@ function combat(Gentil $personnage, $listeEnnemis){
                     break;
                 case 2:
                     $personnage->afficherInfos();
+                    break;
+                case 3:
+                    $personnage->afficherInventaire();
+                    $personnage->utiliserObjetInventaire();
+                    break;
             }
         }
     }
@@ -391,39 +476,45 @@ function ennemiAleatoire($nombreEnnemis){
 
 function jeu($heros, $cmptVictoires){
     while ($cmptVictoires < 11) {
-        echo "Le combat numéro " . $cmptVictoires . " commence\n";
+        echo "Le combat numéro " . $cmptVictoires . " commence.\n";
         $listeMechantsNiveau1 = array(new Mechant("Saibaman", rand(1,3), rand(1,3), ["Coup de poing", "Coup de pied"], 5),
-new Mechant("Raditz", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied"], 5),
-new Mechant("Nappa", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied"], 5),
-new Mechant("Reacum", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied", "Coup de bidon"], 5),
-);
+        new Mechant("Raditz", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied"], 5),
+        new Mechant("Nappa", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied"], 5),
+        new Mechant("Reacum", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied", "Coup de bidon"], 5),
+        );
 
-$listeMechantsNiveau2 = array(new Mechant("C17", rand(1,3), rand(1,3), ["Coup de poing", "Coup de pied"], 5),
-new Mechant("C18", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied"], 5),
-new Mechant("Freezer", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied", "Big Bang Attack"], 5),
-new Mechant("Vegeta", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied", "Big Bang Attack"], 5),
-);
+        $listeMechantsNiveau2 = array(new Mechant("C17", rand(1,3), rand(1,3), ["Coup de poing", "Coup de pied"], 5),
+        new Mechant("C18", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied"], 5),
+        new Mechant("Freezer", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied", "Big Bang Attack"], 5),
+        new Mechant("Vegeta", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied", "Big Bang Attack"], 5),
+        );
         switch ($cmptVictoires) {
             case $cmptVictoires < 5:
                 $listeIndexEnnemi = ennemiAleatoire(1);
                 combat($heros, array($listeMechantsNiveau1[$listeIndexEnnemi[0]]));
                 $cmptVictoires++;
                 // PROPOSITION DE CONTINUER/SAUVEGARDER
-
+                clearTerminal();
                 $choix = readline("Que voulez vous faire?\nContinuer (c)\nSauvegarder (s)");
                 while ($choix != "c" and $choix != "s") {
+                    clearTerminal();
+                    echo "Erreur, merci de saisir C ou S.\n";
                     $choix = readline("Que voulez vous faire?\nContinuer (c)\nSauvegarder (s)");
                 }if ($choix == "s") {
                     sauvegarder($heros, $cmptVictoires);
                 }
+                clearTerminal();
                 break;
             case $cmptVictoires >= 5:
                 $listeIndexEnnemi = ennemiAleatoire(2);
                 combat($heros, array($listeMechantsNiveau2[$listeIndexEnnemi[0]], $listeMechantsNiveau2[$listeIndexEnnemi[1]]));
                 $cmptVictoires++;
                 // PROPOSITION DE CONTINUER/SAUVEGARDER
+                clearTerminal();
                 $choix = readline("Que voulez vous faire?\nContinuer (c)\nSauvegarder (s)");
                 while ($choix != "c" and $choix != "s") {
+                    clearTerminal();
+                    echo "Erreur, merci de saisir C ou S.\n";
                     $choix = readline("Que voulez vous faire?\nContinuer (c)\nSauvegarder (s)");
                 }if ($choix == "s") {
                     sauvegarder($heros, $cmptVictoires);
@@ -434,35 +525,37 @@ new Mechant("Vegeta", rand(3,5), rand(3,5), ["Coup de poing", "Coup de pied", "B
                 exit;
         }
     }
+    $heros->finDeJeu();
 }
 
 function creerPersonnage(){
-    $goku = new Gentil("Goku", 10, 3);
+    $goku = new Gentil("Goku", 10000, 10000);
     $piccolo = new Gentil("Piccolo", 8, 4);
     $yamcha = new Gentil("Yamcha", 5, 2);
 
-    echo "Choisir un personnage\n";
+    echo "Choisir un personnage :\n";
     $choix = (int)readline("1. Goku \n2. Piccolo \n3. Yamcha\n");
+    while ($choix < 1 or $choix > 3) {
+        clearTerminal();
+        echo "Erreur, merci de saisir un chiffre entre 1 et 3.\n";
+        $choix = (int)readline("1. Goku \n2. Piccolo \n3. Yamcha\n");
+    }
     switch ($choix) {
         case 1:
+            clearTerminal();
             return $goku;
-            break;
         case 2:
+            clearTerminal();
             return $piccolo;
-            break;
         case 3:
+            clearTerminal();
             return $yamcha;
-            break;
         // case 4:
         //     $nom = (string)readline("Nom?\n");
         //     $vie = (int)readline("Vie?\n");
         //     $dmg = (int)readline("Dégâts?\n");
         //     $personnage = new Gentil($nom, $vie, $dmg);
         //     break;
-        default:
-            echo "test";
-            creerPersonnage();
-            break;
     }
 }
 
@@ -498,25 +591,27 @@ function clearTerminal(){
 }
 
 function clearTerminalPlayerInput(){
-    popen("cls","w");
-    $entree = readline("Appuyer sur entrée pour continuer");
+    $entree = readline("Appuyer sur entrée pour continuer...");
     while ($entree != "") {
-        $entree = readline("Appuyer sur entrée pour continuer");
+        $entree = readline("Appuyer sur entrée pour continuer...");
     }
-    sleep(1);
+    popen("cls","w");
 }
 
 // RUN
 
+clearTerminal();
 $nouvellePartie = strtolower(readline("Nouvelle partie (n)\nCharger partie (c)\n"));
 clearTerminal();
 while ($nouvellePartie != "n" and $nouvellePartie != "c") {
     clearTerminal();
-    echo "Erreur\n";
+    echo "Erreur, merci de saisir N ou C.\n";
     $nouvellePartie = strtolower(readline("Nouvelle partie (n)\nCharger partie (c)\n"));
     clearTerminal();
-}if ($nouvellePartie == "c" && filesize("save.txt" == 0)) {
-    echo "Aucune partie n'a été sauvegardée\nVous allez commencer une nouvelle partie\n";
+}if ($nouvellePartie == "c" && filesize("save.txt") == 0) {
+    clearTerminal();
+    echo "Aucune sauvegarde n'a été trouvée. \nVous allez commencer une nouvelle partie.\n";
+    clearTerminalPlayerInput();
     $nouvellePartie = "n";
 }if ($nouvellePartie == "n"){
     jeu(creerPersonnage(), 1);   
@@ -526,4 +621,5 @@ while ($nouvellePartie != "n" and $nouvellePartie != "c") {
     $cmptVictoires = $lst[1];
     jeu($personnage, $cmptVictoires);   
 }
+
 ?>
